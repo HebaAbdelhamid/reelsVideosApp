@@ -38,7 +38,7 @@ dependencies:
   http:
   video_player:
   flutter_bloc:
-  shared_preferences:
+  flutter_cache_manager:
 
 dev_dependencies:
   flutter_test:

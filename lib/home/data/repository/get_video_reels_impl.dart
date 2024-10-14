@@ -1,19 +1,15 @@
 import 'package:reelsapp/home/data/dataSource/remote_data_source.dart';
 import 'package:reelsapp/home/data/model/videoModel.dart';
-import 'package:reelsapp/home/domain/entities/video.dart';
 import 'package:reelsapp/home/domain/repository/get_video_reels.dart';
 
-
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class VideoRepositoryImpl implements VideoRepository {
   final VideoApiService apiService;
-  final SharedPreferences sharedPreferences;
+  final DefaultCacheManager cacheManager;
 
-  final String _cacheKey = 'cached_videos';
-
-  VideoRepositoryImpl(this.apiService, this.sharedPreferences);
+  VideoRepositoryImpl(this.apiService, this.cacheManager);
 
   @override
   Future<List<VideoModel>> fetchVideos() async {
@@ -30,21 +26,20 @@ class VideoRepositoryImpl implements VideoRepository {
     }
   }
 
-  void _cacheVideos(List<VideoModel> videos) {
+  void _cacheVideos(List<VideoModel> videos) async {
     final String jsonVideos = jsonEncode(videos.map((video) => video.toJson()).toList());
-    sharedPreferences.setString(_cacheKey, jsonVideos);
+    await cacheManager.putFile('cached_videos.json', utf8.encode(jsonVideos));
   }
 
   Future<List<VideoModel>?> getCachedVideos() async {
-    final String? cachedData = sharedPreferences.getString(_cacheKey);
-
-    if (cachedData != null) {
+    try {
+      final file = await cacheManager.getSingleFile('cached_videos.json');
+      final String cachedData = await file.readAsString();
       List<dynamic> decodedData = jsonDecode(cachedData);
       List<VideoModel> videos = decodedData.map((video) => VideoModel.fromJson(video)).toList();
       return videos;
+    } catch (e) {
+      return null;
     }
-
-    return null;
   }
 }
-
