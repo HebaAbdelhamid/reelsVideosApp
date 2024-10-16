@@ -22,6 +22,10 @@ class VideoRepositoryImpl implements VideoRepository {
 
       _cacheVideos(videos);
 
+      for (var video in videos) {
+        await _downloadAndCacheVideo(video.videoUrl, video.id as String);
+      }
+
       return videos;
     }
   }
@@ -39,6 +43,27 @@ class VideoRepositoryImpl implements VideoRepository {
       List<VideoModel> videos = decodedData.map((video) => VideoModel.fromJson(video)).toList();
       return videos;
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _downloadAndCacheVideo(String videoUrl, String videoId) async {
+    try {
+      final videoResponse = await apiService.downloadVideo(videoUrl);
+      if (videoResponse != null) {
+        await cacheManager.putFile('$videoId.mp4', videoResponse);
+      }
+    } catch (e) {
+      print('Error caching video $videoId: $e');
+    }
+  }
+
+  Future getCachedVideo(String videoId) async {
+    try {
+      final cachedVideoFile = await cacheManager.getSingleFile('$videoId.mp4');
+      return cachedVideoFile;
+    } catch (e) {
+      print('Error retrieving cached video $videoId: $e');
       return null;
     }
   }

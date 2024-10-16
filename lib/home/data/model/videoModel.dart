@@ -6,7 +6,7 @@ class VideoModel extends Video {
   factory VideoModel.fromJson(Map<String, dynamic> json) {
     return VideoModel(
       id: json['id'],
-      videoUrl: json['video'], // Assuming the video URL is in the 'video' field
+      videoUrl: json['video'],
     );
   }
 

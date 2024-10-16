@@ -39,6 +39,7 @@ dependencies:
   video_player:
   flutter_bloc:
   flutter_cache_manager:
+  dio:
 
 dev_dependencies:
   flutter_test:

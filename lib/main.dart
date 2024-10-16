@@ -10,8 +10,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 void main() async{
+  final String baseUrl="https://api.sawalef.app/api/v1";
+
   WidgetsFlutterBinding.ensureInitialized();
-  VideoApiService apiService = VideoApiService();
+  VideoApiService apiService = VideoApiService(baseUrl);
   DefaultCacheManager cacheManager=DefaultCacheManager();
   VideoRepositoryImpl videoRepository = VideoRepositoryImpl(apiService, cacheManager);
   FetchVideos fetchVideosUseCase = FetchVideos(videoRepository);
